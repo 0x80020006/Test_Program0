@@ -12,6 +12,8 @@ namespace Test_Program
     {
         string FilePath;
         PictureBox backGround;
+        int backGround_X = 0;
+        int backGround_Y = 0;
 
         PictureBox pBox1;
         int pBox1_X = 0;
@@ -31,7 +33,7 @@ namespace Test_Program
             MinimumSize = new Size(MF_WIDTH, MF_HEIGHT);
             
             backGround = new PictureBox();
-            backGround.Location = new Point(0, 0);
+            backGround.Location = new Point(backGround_X, backGround_Y);
             backGround.BackColor = Color.AliceBlue;
             backGround.Size = new Size(BG_WIDTH, BG_HEIGHT);
 
@@ -62,18 +64,22 @@ namespace Test_Program
             {
                 case Keys.Up:
                     pBox1_Y += 1;
+                    backGround_Y -= 1;
                     break;
 
                 case Keys.Down:
                     pBox1_Y -= 1;
+                    backGround_Y += 1;
                     break;
 
                 case Keys.Left:
                     pBox1_X -= 1;
+                    backGround_X += 1;
                     break;
 
                 case Keys.Right:
                     pBox1_X += 1;
+                    backGround_X -= 1;
                     break;
 
                 default:
@@ -82,6 +88,7 @@ namespace Test_Program
             }
 
             pBox1.Location = new Point(pBox1_X, pBox1_Y);
+            backGround.Location = new Point(backGround_X, backGround_Y);
         }
 
         void ViewImage(Graphics g, int px, int py)
