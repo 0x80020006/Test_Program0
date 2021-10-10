@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace Test_Program
 
         //読み込んだファイル一覧
         List<string> filesList;
+        List<string> fileNameList;
+        List<FileInfo> fileInfo;
 
         //メニューバー
         MenuStrip menuStrip;
@@ -36,6 +39,13 @@ namespace Test_Program
         int lBox1_X = 0;
         int lBox1_Y = 23;
 
+        ListView lView1;
+        int lView1_X = 0;
+        int lView1_Y = 23;
+
+        ColumnHeader lView1Name;
+        ColumnHeader lView1FileSize;
+
         Button button1;
         int btn1_X = 100;
         int btn1_Y = 23;
@@ -51,8 +61,10 @@ namespace Test_Program
         static readonly int PB1_HEIGHT = 100;
         static readonly int PN1_WIDTH  = 50;
         static readonly int PN1_HEIGHT = 50;
+        static readonly int LV1_WIDTH  = 200;
+        static readonly int LV1_HEIGHT = 400;
         static readonly int LB1_WIDTH  = 200;
-        static readonly int LB1_HEIGHT = 50;
+        static readonly int LB1_HEIGHT = 400;
         static readonly int BTN1_WIDTH  = 100;
         static readonly int BTN1_HEIGHT = 100;
 
@@ -83,13 +95,24 @@ namespace Test_Program
             panel1.BackColor = Color.Blue;
             panel1.Size = new Size(PN1_WIDTH, PN1_HEIGHT);
 
+            //ListViewを追加
+            lView1_X = ClientSize.Width;
+            lView1 = new ListView();
+            lView1.Location = new Point(lView1_X, lView1_Y);
+            lView1.BackColor = Color.Green;
+            lView1.Size = new Size(LV1_WIDTH, LV1_HEIGHT);
+            //ListViewへのColumnの追加
+            lView1.View = View.Details;
+            lView1Name = new ColumnHeader();
+
+            lView1Name.Text = "名前";
+            ColumnHeader[] lView1Header = { lView1Name };
+            lView1.Columns.AddRange(lView1Header);
+
             //ListBoxを追加
-            lBox1_X = ClientSize.Width;
+            lBox1_X = ClientSize.Width - lBox1_X;
             lBox1 = new ListBox();
             lBox1.Location = new Point(lBox1_X, lBox1_Y);
-            lBox1.BackColor = Color.Green;
-            //ListBoxは自動でサイズがIntegralHeightの設定で変更されるため、プロパティで無効にする
-            lBox1.IntegralHeight = false;
             lBox1.Size = new Size(LB1_WIDTH, LB1_HEIGHT);
 
             //Buttonを追加
@@ -101,7 +124,7 @@ namespace Test_Program
             button1.Size = new Size(BTN1_WIDTH, BTN1_HEIGHT);
 
             //コントロールを追加するときはContlors.AddRangeを使う
-            Controls.AddRange(new Control[] {menuStrip, button1, pBox1, lBox1, panel1, backGround});
+            Controls.AddRange(new Control[] {menuStrip, button1, pBox1, lView1, lBox1, panel1, backGround});
             KeyDown += new KeyEventHandler(KeyControl);
             button1.Click += new EventHandler(button1_Click);
             Load += new EventHandler(MainForm_Load);
@@ -142,20 +165,17 @@ namespace Test_Program
             {
                 Console.WriteLine($"読み込みファイル:{ofd.FileName}");
                 string folderPath = Path.GetDirectoryName(ofd.FileName);
-                IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
 
-                //フォルダ内部のファイルを全て読み込んでリストに格納
-                filesList = files.ToList();
+                //↓はListで要素格納できるけど、データサイズが格納できていない？
+                //IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
+                //filesList = files.ToList();
+                //Console.WriteLine($"{fileInfo[0]},{fileInfo[0].Length}");
 
-                int LoadFiles = filesList.Count;
 
-                lBox1.BeginUpdate();
-                for (int i = 0; i < LoadFiles; i++)
-                {
-                    string n = filesList[i];
-                    lBox1.Items.Add(string.Format($"{Path.GetFileName(n)}", i));
-                }
-                lBox1.EndUpdate();
+                //↓は動くけど、*(ワイルドカード)で要素を格納しているため、余計なファイルも格納してしまう
+                fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
+                Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
+                fileInfo.ForEach(Console.WriteLine);
 
             }
         }
@@ -209,19 +229,19 @@ namespace Test_Program
             if (button1Flag == false)
             {
                 panel1_X = ClientSize.Width - PN1_WIDTH;
-                lBox1_X = ClientSize.Width - LB1_WIDTH;
+                lView1_X = ClientSize.Width - LV1_WIDTH;
                 //panel1.Location = new Point(panel1_X, panel1_Y);
                 button1Flag = true;
             }
             else if (button1Flag == true)
             {
                 panel1_X = ClientSize.Width;
-                lBox1_X = ClientSize.Width;
+                lView1_X = ClientSize.Width;
                 //panel1.Location = new Point(panel1_X, panel1_Y);
                 button1Flag = false;
             }
-            lBox1.Location = new Point(lBox1_X, lBox1_Y);
-            Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
+            lView1.Location = new Point(lView1_X, lView1_Y);
+            Console.WriteLine($"{lView1.Size}{LV1_HEIGHT}");
             Console.WriteLine($"{button1Flag}");
 
         }
@@ -231,13 +251,13 @@ namespace Test_Program
             //ウィンドウサイズ変更時にListBoxの位置も合わせて調整する
             if (button1Flag == false)
             {
-                lBox1_X = ClientSize.Width;
+                lView1_X = ClientSize.Width;
             }
             else if (button1Flag == true)
             {
-                lBox1_X = ClientSize.Width - LB1_WIDTH;
+                lView1_X = ClientSize.Width - LV1_WIDTH;
             }
-            lBox1.Location = new Point(lBox1_X, lBox1_Y);
+            lView1.Location = new Point(lView1_X, lView1_Y);
         }
 
         void ViewImage(Graphics g, int px, int py)
