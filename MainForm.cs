@@ -23,6 +23,10 @@ namespace Test_Program
         int panel1_X = 0;
         int panel1_Y = 0;
 
+        ListBox lBox1;
+        int lBox1_X = 0;
+        int lBox1_Y = 0;
+
         Button button1;
         int btn1_X = 100;
         int btn1_Y = 0;
@@ -38,6 +42,8 @@ namespace Test_Program
         static readonly int PB1_HEIGHT = 100;
         static readonly int PN1_WIDTH  = 50;
         static readonly int PN1_HEIGHT = 50;
+        static readonly int LB1_WIDTH  = 50;
+        static readonly int LB1_HEIGHT = 50;
         static readonly int BTN1_WIDTH  = 100;
         static readonly int BTN1_HEIGHT = 100;
 
@@ -66,6 +72,16 @@ namespace Test_Program
             panel1.BackColor = Color.Blue;
             panel1.Size = new Size(PN1_WIDTH, PN1_HEIGHT);
 
+            //ListBoxを追加
+            lBox1_X = ClientSize.Width;
+            lBox1_Y = 0;
+            lBox1 = new ListBox();
+            lBox1.Location = new Point(lBox1_X, lBox1_Y);
+            lBox1.BackColor = Color.Green;
+            //ListBoxは自動でサイズがIntegralHeightの設定で変更されるため、プロパティで無効にする
+            lBox1.IntegralHeight = false;
+            lBox1.Size = new Size(LB1_WIDTH, LB1_HEIGHT);
+
             //Buttonを追加
             button1 = new Button();
             button1.Text = "リスト";
@@ -75,7 +91,7 @@ namespace Test_Program
             button1.Size = new Size(BTN1_WIDTH, BTN1_HEIGHT);
 
             //コントロールを追加するときはContlors.AddRangeを使う
-            Controls.AddRange(new Control[] {button1, pBox1, panel1, backGround});
+            Controls.AddRange(new Control[] {button1, pBox1, lBox1, panel1, backGround});
             KeyDown += new KeyEventHandler(KeyControl);
             button1.Click += new EventHandler(button1_Click);
             Load += new EventHandler(MainForm_Load);
@@ -135,15 +151,21 @@ namespace Test_Program
             if (button1Flag == false)
             {
                 panel1_X = ClientSize.Width - PN1_WIDTH;
-                panel1.Location = new Point(panel1_X, panel1_Y);
+                lBox1_X = ClientSize.Width - LB1_WIDTH;
+                //panel1.Location = new Point(panel1_X, panel1_Y);
+                lBox1.Location = new Point(lBox1_X, lBox1_Y);
                 button1Flag = true;
+                Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
                 Console.WriteLine($"{button1Flag}");
             }
             else if (button1Flag == true)
             {
                 panel1_X = ClientSize.Width;
-                panel1.Location = new Point(panel1_X, panel1_Y);
+                lBox1_X = ClientSize.Width;
+                //panel1.Location = new Point(panel1_X, panel1_Y);
+                lBox1.Location = new Point(lBox1_X, lBox1_Y);
                 button1Flag = false;
+                Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
                 Console.WriteLine($"{button1Flag}");
             }
 
