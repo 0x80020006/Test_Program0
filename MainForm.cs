@@ -11,25 +11,34 @@ namespace Test_Program
     class MainForm : Form
     {
         string FilePath;
+
+        //読み込んだファイル一覧
+        List<string> filesList;
+
+        //メニューバー
+        MenuStrip menuStrip;
+        OpenFileDialog ofd;
+
+
         PictureBox backGround;
         int backGround_X = 0;
-        int backGround_Y = 0;
+        int backGround_Y = 23;
 
         PictureBox pBox1;
         int pBox1_X = 0;
-        int pBox1_Y = 0;
+        int pBox1_Y = 23;
 
         Panel panel1;
         int panel1_X = 0;
-        int panel1_Y = 0;
+        int panel1_Y = 23;
 
         ListBox lBox1;
         int lBox1_X = 0;
-        int lBox1_Y = 0;
+        int lBox1_Y = 23;
 
         Button button1;
         int btn1_X = 100;
-        int btn1_Y = 0;
+        int btn1_Y = 23;
         bool button1Flag = false;
 
         Bitmap imgMF = new Bitmap(1, 1);
@@ -42,7 +51,7 @@ namespace Test_Program
         static readonly int PB1_HEIGHT = 100;
         static readonly int PN1_WIDTH  = 50;
         static readonly int PN1_HEIGHT = 50;
-        static readonly int LB1_WIDTH  = 50;
+        static readonly int LB1_WIDTH  = 200;
         static readonly int LB1_HEIGHT = 50;
         static readonly int BTN1_WIDTH  = 100;
         static readonly int BTN1_HEIGHT = 100;
@@ -51,6 +60,9 @@ namespace Test_Program
         public MainForm()
         {
             MinimumSize = new Size(MS_WIDTH, MS_HEIGHT);
+
+            //メニューバー表示
+            menuStrip = new MenuStrip();
 
             //PictureBoxを追加
             backGround = new PictureBox();
@@ -66,7 +78,6 @@ namespace Test_Program
 
             //Panelを追加
             panel1_X = ClientSize.Width;
-            panel1_Y = 0;
             panel1 = new Panel();
             panel1.Location = new Point(panel1_X, panel1_Y);
             panel1.BackColor = Color.Blue;
@@ -74,7 +85,6 @@ namespace Test_Program
 
             //ListBoxを追加
             lBox1_X = ClientSize.Width;
-            lBox1_Y = 0;
             lBox1 = new ListBox();
             lBox1.Location = new Point(lBox1_X, lBox1_Y);
             lBox1.BackColor = Color.Green;
@@ -91,7 +101,7 @@ namespace Test_Program
             button1.Size = new Size(BTN1_WIDTH, BTN1_HEIGHT);
 
             //コントロールを追加するときはContlors.AddRangeを使う
-            Controls.AddRange(new Control[] {button1, pBox1, lBox1, panel1, backGround});
+            Controls.AddRange(new Control[] {menuStrip, button1, pBox1, lBox1, panel1, backGround});
             KeyDown += new KeyEventHandler(KeyControl);
             button1.Click += new EventHandler(button1_Click);
             Load += new EventHandler(MainForm_Load);
@@ -101,9 +111,57 @@ namespace Test_Program
         {
             //ウィンドウサイズが変更されたときに呼び出す
             SizeChanged += Window_SizeChanged;
+
+            //メニューにファイルを表示する
+            ToolStripMenuItem menuFile = new ToolStripMenuItem();
+            menuFile.Text = "ファイル(&F)";
+            menuStrip.Items.Add(menuFile);
+
+            //メニュー内容            
+            ToolStripMenuItem menuFileOpen = new ToolStripMenuItem();
+
+            menuFileOpen.Text = "開く(&O)";
+            //「ファイルを開く」の実行
+            menuFileOpen.Click += new EventHandler(Open_Click);
+            menuFile.DropDownItems.Add(menuFileOpen);
+            ToolStripMenuItem menuFileEnd = new ToolStripMenuItem();
+
+            menuFileEnd.Text = "終了(&X)";
+            //「アプリケーションの終了」の実行
+            menuFileEnd.Click += new EventHandler(Close_Click);
+            menuFile.DropDownItems.Add(menuFileEnd);
         }
 
-            void LoadImage()
+        private void Open_Click(object sender, EventArgs e)
+        {
+            ofd = new OpenFileDialog();
+            //読み込み許可ファイルの種類の設定 
+            ofd.Filter = "Image File(*.bmp,*.jpg,*.png)|*.bmp;*.jpg;*.png|Bitmap(*.bmp)|*.bmp|Jpeg(*.jpg)|*.jpg|PNG(*.png)|*.png";
+            //ファイルを選択してOKしたときの処理
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                Console.WriteLine($"読み込みファイル:{ofd.FileName}");
+                string folderPath = Path.GetDirectoryName(ofd.FileName);
+                IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
+
+                //フォルダ内部のファイルを全て読み込んでリストに格納
+                filesList = files.ToList();
+
+                int LoadFiles = filesList.Count;
+
+                lBox1.BeginUpdate();
+                for (int i = 0; i < LoadFiles; i++)
+                {
+                    string n = filesList[i];
+                    lBox1.Items.Add(string.Format($"{Path.GetFileName(n)}", i));
+                }
+                lBox1.EndUpdate();
+
+            }
+        }
+
+
+                void LoadImage()
         {
 
         }
@@ -153,32 +211,44 @@ namespace Test_Program
                 panel1_X = ClientSize.Width - PN1_WIDTH;
                 lBox1_X = ClientSize.Width - LB1_WIDTH;
                 //panel1.Location = new Point(panel1_X, panel1_Y);
-                lBox1.Location = new Point(lBox1_X, lBox1_Y);
                 button1Flag = true;
-                Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
-                Console.WriteLine($"{button1Flag}");
             }
             else if (button1Flag == true)
             {
                 panel1_X = ClientSize.Width;
                 lBox1_X = ClientSize.Width;
                 //panel1.Location = new Point(panel1_X, panel1_Y);
-                lBox1.Location = new Point(lBox1_X, lBox1_Y);
                 button1Flag = false;
-                Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
-                Console.WriteLine($"{button1Flag}");
             }
+            lBox1.Location = new Point(lBox1_X, lBox1_Y);
+            Console.WriteLine($"{lBox1.Size}{LB1_HEIGHT}");
+            Console.WriteLine($"{button1Flag}");
 
         }
 
         private void Window_SizeChanged(object sender, EventArgs e)
         {
-
+            //ウィンドウサイズ変更時にListBoxの位置も合わせて調整する
+            if (button1Flag == false)
+            {
+                lBox1_X = ClientSize.Width;
+            }
+            else if (button1Flag == true)
+            {
+                lBox1_X = ClientSize.Width - LB1_WIDTH;
+            }
+            lBox1.Location = new Point(lBox1_X, lBox1_Y);
         }
 
         void ViewImage(Graphics g, int px, int py)
         {
              
+        }
+
+        //アプリケーション終了
+        private void Close_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
     }
