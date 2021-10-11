@@ -167,15 +167,22 @@ namespace Test_Program
                 string folderPath = Path.GetDirectoryName(ofd.FileName);
 
                 //↓はListで要素格納できるけど、データサイズが格納できていない？
-                //IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
-                //filesList = files.ToList();
-                //Console.WriteLine($"{fileInfo[0]},{fileInfo[0].Length}");
+                IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
+                filesList = files.ToList();
+                fileInfo = new List<FileInfo>();
+                for (int i = 0; i < filesList.Count - 1; i++)
+                {
+                    FileInfo f = new FileInfo(filesList[i]);
+                    fileInfo.Add(f);
+                    //long fileSize = f.Length;
+                    //Console.WriteLine($"{fileSize}");
+                }
 
 
                 //↓は動くけど、*(ワイルドカード)で要素を格納しているため、余計なファイルも格納してしまう
-                fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
+                //fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
                 Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
-                fileInfo.ForEach(Console.WriteLine);
+                //fileInfo.ForEach(Console.WriteLine);
 
             }
         }
