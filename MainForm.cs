@@ -17,6 +17,7 @@ namespace Test_Program
         List<string> filesList;
         List<string> fileNameList;
         List<FileInfo> fileInfo;
+        List<long> fileSizeList;
 
         //メニューバー
         MenuStrip menuStrip;
@@ -104,9 +105,11 @@ namespace Test_Program
             //ListViewへのColumnの追加
             lView1.View = View.Details;
             lView1Name = new ColumnHeader();
+            lView1FileSize = new ColumnHeader();
 
             lView1Name.Text = "名前";
-            ColumnHeader[] lView1Header = { lView1Name };
+            lView1FileSize.Text = "サイズ";
+            ColumnHeader[] lView1Header = { lView1Name, lView1FileSize};
             lView1.Columns.AddRange(lView1Header);
 
             //ListBoxを追加
@@ -128,6 +131,12 @@ namespace Test_Program
             KeyDown += new KeyEventHandler(KeyControl);
             button1.Click += new EventHandler(button1_Click);
             Load += new EventHandler(MainForm_Load);
+
+            List<long> lLong = new List<long> { };
+            long l = 1;
+            lLong.Add(l);
+            Console.WriteLine($"{lLong[0]}");
+
         }
 
         void MainForm_Load(object sender, EventArgs e)
@@ -166,22 +175,30 @@ namespace Test_Program
                 Console.WriteLine($"読み込みファイル:{ofd.FileName}");
                 string folderPath = Path.GetDirectoryName(ofd.FileName);
 
-                //↓はListで要素格納できるけど、データサイズが格納できていない？
+                //もっと綺麗なコードの書き方があるかもしれないけど、とりあえずファイル情報の格納に成功
                 IEnumerable<string> files = Directory.EnumerateFiles(folderPath).Where(str => str.EndsWith(".bmp") || str.EndsWith(".jpg") || str.EndsWith(".png"));
                 filesList = files.ToList();
+                //ファイル情報用のListの枠作り
                 fileInfo = new List<FileInfo>();
+                //ファイルサイズ用のListの枠作り
+                fileSizeList = new List<long>();
                 for (int i = 0; i < filesList.Count - 1; i++)
                 {
                     FileInfo f = new FileInfo(filesList[i]);
                     fileInfo.Add(f);
+                    //↓明示的な変換は可能
+                    //int x = (int)fileInfo[i].Length;
+                    //↓でファイルサイズのみを取り出せた                    
+                    fileSizeList.Add(fileInfo[i].Length);
+                    
+                    //lView1.Items.Add(new ListViewItem(fileInfo[i]));
                     //long fileSize = f.Length;
                     //Console.WriteLine($"{fileSize}");
                 }
-
-
-                //↓は動くけど、*(ワイルドカード)で要素を格納しているため、余計なファイルも格納してしまう
+                //↓は動くけど、*(ワイルドカード)でファイル情報を格納しているため、余計なファイルも格納してしまう
                 //fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
                 Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
+                Console.WriteLine($"{fileSizeList[1]}");
                 //fileInfo.ForEach(Console.WriteLine);
 
             }
