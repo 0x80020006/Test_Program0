@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -47,6 +48,11 @@ namespace Test_Program
         ColumnHeader lView1Name;
         ColumnHeader lView1FileSize;
 
+        DataTable dTable1;
+        DataSet dTable1Set;
+        int dTable1_X = 0;
+        int dTable1_Y = 23;
+
         Button button1;
         int btn1_X = 100;
         int btn1_Y = 23;
@@ -64,6 +70,8 @@ namespace Test_Program
         static readonly int PN1_HEIGHT = 50;
         static readonly int LV1_WIDTH  = 200;
         static readonly int LV1_HEIGHT = 400;
+        static readonly int DT1_WIDTH  = 200;
+        static readonly int DT1_HEIGHT = 400;
         static readonly int LB1_WIDTH  = 200;
         static readonly int LB1_HEIGHT = 400;
         static readonly int BTN1_WIDTH  = 100;
@@ -111,6 +119,14 @@ namespace Test_Program
             lView1FileSize.Text = "サイズ";
             ColumnHeader[] lView1Header = { lView1Name, lView1FileSize};
             lView1.Columns.AddRange(lView1Header);
+
+            //DataTableを追加
+            dTable1_X = ClientSize.Width;
+            dTable1 = new DataTable("FileDataTable");
+            dTable1Set = new DataSet();
+            dTable1.Columns.Add("名前");
+            dTable1.Columns.Add("サイズ");
+            dTable1Set.Tables.Add(dTable1);
 
             //ListBoxを追加
             lBox1_X = ClientSize.Width - lBox1_X;
@@ -182,6 +198,10 @@ namespace Test_Program
                 fileInfo = new List<FileInfo>();
                 //ファイルサイズ用のListの枠作り
                 fileSizeList = new List<long>();
+
+                //ファイル情報用データテーブルの枠作り
+                //DataRow filesData = dTable1.NewRow();
+
                 for (int i = 0; i < filesList.Count - 1; i++)
                 {
                     FileInfo f = new FileInfo(filesList[i]);
@@ -190,16 +210,22 @@ namespace Test_Program
                     //int x = (int)fileInfo[i].Length;
                     //↓でファイルサイズのみを取り出せた                    
                     fileSizeList.Add(fileInfo[i].Length);
-                    
-                    //lView1.Items.Add(new ListViewItem(fileInfo[i]));
+
+                    //lView1.Items[i].SubItems.Add(fileInfo[i].Length);
                     //long fileSize = f.Length;
                     //Console.WriteLine($"{fileSize}");
+
+                    //データテーブルにデータ追加
+                    dTable1.Rows.Add(fileInfo[i], fileInfo[i].Length);
+
                 }
                 //↓は動くけど、*(ワイルドカード)でファイル情報を格納しているため、余計なファイルも格納してしまう
                 //fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
-                Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
-                Console.WriteLine($"{fileSizeList[1]}");
+                //Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
+                //Console.WriteLine($"{fileSizeList[1]}");
+                Console.WriteLine($"{dTable1.Rows[0].ItemArray[1]}");
                 //fileInfo.ForEach(Console.WriteLine);
+
 
             }
         }
