@@ -202,6 +202,7 @@ namespace Test_Program
                 //ファイル情報用データテーブルの枠作り
                 //DataRow filesData = dTable1.NewRow();
 
+                lView1.BeginUpdate();
                 for (int i = 0; i < filesList.Count - 1; i++)
                 {
                     FileInfo f = new FileInfo(filesList[i]);
@@ -211,14 +212,27 @@ namespace Test_Program
                     //↓でファイルサイズのみを取り出せた                    
                     fileSizeList.Add(fileInfo[i].Length);
 
-                    //lView1.Items[i].SubItems.Add(fileInfo[i].Length);
+                    //↓ListViewは文字(String)に変換しないとダメ？
+                    lView1.Items.Add(Convert.ToString(fileInfo[i]));
+                    lView1.Items[i].SubItems.Add($"{Convert.ToString(fileInfo[i].Length)}");
+
+                    //↓無意味になった
                     //long fileSize = f.Length;
                     //Console.WriteLine($"{fileSize}");
 
-                    //データテーブルにデータ追加
+                    //データテーブルにデータ追加(変換しないとダメそう、よくわからん)
                     dTable1.Rows.Add(fileInfo[i], fileInfo[i].Length);
+                    
+                    //[失敗]↓正しく情報を読み出せない
+                    //dTable1.Rows.Add(filesList[i], filesList[i].Length);
+
+                    //ListViewにDataTableのデータを表示させるには？
+
+                    
+
 
                 }
+                lView1.EndUpdate();
                 //↓は動くけど、*(ワイルドカード)でファイル情報を格納しているため、余計なファイルも格納してしまう
                 //fileInfo = new DirectoryInfo(folderPath).EnumerateFiles("*", SearchOption.TopDirectoryOnly).ToList();
                 //Console.WriteLine($"{fileInfo[1]},{fileInfo[1].Length}");
